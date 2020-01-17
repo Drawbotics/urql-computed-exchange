@@ -1,5 +1,6 @@
 import fclone from 'fclone';
-import { Entity, Entities } from './types';
+
+import { Entities, Entity } from './types';
 
 function _mergeFields(target: Entity, source: Entity): Entity {
   const targetCopy = fclone(target);
