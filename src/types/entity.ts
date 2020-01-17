@@ -1,7 +1,7 @@
 import { DocumentNode } from 'graphql';
 
 interface FieldResolver<T> {
-  dependencies: DocumentNode;
+  dependencies?: DocumentNode;
   resolver: (entity: any) => T;
 }
 
