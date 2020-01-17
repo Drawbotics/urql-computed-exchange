@@ -1,5 +1,5 @@
 {
-  "name": "urql-domain-exchange",
+  "name": "urql-computed-exchange",
   "version": "1.0.0",
   "description": "URQL exchange to allow computed properties in GraphQL queries.",
   "keywords": [],
@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Drawbotics/drawbotics-use-filters"
+    "url": "https://github.com/Drawbotics/urql-computed-filters"
   },
   "scripts": {
     "clean": "rimraf lib/",
@@ -25,6 +25,11 @@
   "lint-staged": {
     "*.{ts,tsx}": "eslint --ext ts,tsx --format node_modules/eslint-formatter-pretty -c .eslintrc.js --max-warnings=0"
   },
+  "peerDependencies": {
+    "graphql": "14.x",
+    "urql": "1.8.x",
+    "wonka": "4.x"
+  },
   "devDependencies": {
     "@types/jest": "^24.9.0",
     "@types/lodash": "^4.14.149",
@@ -33,11 +38,18 @@
     "eslint": "^6.8.0",
     "eslint-formatter-pretty": "^3.0.1",
     "eslint-plugin-jest": "^23.6.0",
+    "graphql": "^14.5.8",
     "husky": "^4.0.10",
     "jest": "^24.9.0",
     "lint-staged": "^9.5.0",
     "rimraf": "^3.0.0",
     "ts-jest": "^24.3.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "urql": "^1.8.2",
+    "wonka": "^4.0.7"
+  },
+  "dependencies": {
+    "fclone": "^1.0.11",
+    "graphql-anywhere": "^4.2.6"
   }
 }

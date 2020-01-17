@@ -1,19 +1,19 @@
-# URQL Domain Exchange
+# URQL Computed Exchange
 
-An [URQL](https://github.com/FormidableLabs/urql) exchange to compute data using resolvers and domain entities.
+An [URQL](https://github.com/FormidableLabs/urql) exchange to compute data using resolvers and entities.
 
 ## Installation
 
 ```bash
-$ npm i urql-domain-exchange
+$ npm i urql-computed-exchange
 ```
 
 ## Usage
 
-First, create your domain entities and their resolvers:
+First, create your entities and their resolvers:
 
 ```javascript
-// domain.js
+// entities.js
 
 const Pokemon = {
   numberOfEvolutions: {
@@ -40,7 +40,7 @@ Then, add it to the list of exchanges in URQL when setting up the client:
 ```javascript
 // client.js
 
-import urqlDomainExchange from 'urql-domain-exchange';
+import urqlComputedExchange from 'urql-computed-exchange';
 import {
   createClient,
   cacheExchange,
@@ -48,7 +48,7 @@ import {
   fetchExchange,
 } from 'urql';
 
-import domain from './domain';
+import entities from './entities';
 
 
 const client = createClient({
@@ -56,7 +56,7 @@ const client = createClient({
   exchanges: [
     dedupExchange,
     cacheExchange,
-    domainExchange({ domain }),
+    computedExchange({ entities }),
     fetchExchange,
   ],
 });
