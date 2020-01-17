@@ -10,4 +10,4 @@ export interface Entity<T = any> {
   fields: { [K in keyof T]: FieldResolver<T[K]> };
 }
 
-export type Entities = Record<string, Entity>;
+export type Entities = Record<string, Entity | undefined>;

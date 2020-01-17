@@ -1,22 +1,20 @@
-import {
-  ASTNode,
-  DefinitionNode,
-  DocumentNode,
-  FieldNode,
-  StringValueNode,
-  ValueNode,
-  visit,
-} from 'graphql';
+import { ASTNode, DefinitionNode, DocumentNode, FieldNode, visit } from 'graphql';
 import flatten from 'lodash/flatten';
 
 import { Entities, NodeWithDirectives } from './types';
 
-function _isStringValueNode(node?: ValueNode): node is StringValueNode {
-  return node != null && node.kind === 'StringValue';
-}
-
 function _isNodeWithDirectives(node?: any): node is NodeWithDirectives {
   return node != null && node.directives != null;
+}
+
+function _getDirectiveType(directiveNode: any): string {
+  const typeName = directiveNode?.arguments?.[0]?.value?.value;
+
+  if (typeName == null) {
+    throw new Error('Invalid @computed directive found. No type specified');
+  }
+
+  return typeName;
 }
 
 export function nodeHasComputedDirectives(node?: ASTNode): boolean {
@@ -38,24 +36,19 @@ export function replaceDirectivesByFragments(
 
   const replaceDirectiveByFragment = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
-
-    if (!_isStringValueNode(computedDirective?.arguments?.[0].value)) {
-      throw new Error('Invalid type name found in @computed directive.');
-    }
-
-    const directiveType = computedDirective?.arguments?.[0].value.value;
-
-    if (directiveType == null) {
-      throw new Error('Invalid @computed directive found. No type specified');
-    }
-
+    const directiveType = _getDirectiveType(computedDirective);
     const entityType = entities[directiveType];
+
+    if (entityType == null) {
+      throw new Error(`No entity found for type "${directiveType}"`);
+    }
+
     const fieldName = node.name.value;
     const entityField = entityType.fields[fieldName];
 
     if (entityField == null) {
       throw new Error(
-        `No resolver found for @computed directive "${fieldName}" in type "${directiveType}`,
+        `No resolver found for @computed directive "${fieldName}" in type "${directiveType}"`,
       );
     }
 
@@ -90,17 +83,7 @@ export function addFragmentsFromDirectives(
 
   const addFragmentToNode = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
-
-    if (!_isStringValueNode(computedDirective?.arguments?.[0].value)) {
-      throw new Error('Invalid type name found in @computed directive.');
-    }
-
-    const directiveType = computedDirective?.arguments?.[0].value.value;
-
-    if (directiveType == null) {
-      throw new Error('Invalid @computed directive found. No type specified');
-    }
-
+    const directiveType = _getDirectiveType(computedDirective);
     const entityType = entities[directiveType];
 
     if (entityType == null) {
