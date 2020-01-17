@@ -1,5 +1,6 @@
-import { mergeEntities } from '../merge-entities';
 import { Entity } from 'src/types';
+
+import { mergeEntities } from '../merge-entities';
 
 describe('urql-computed-exchange', () => {
   describe('mergeEntities', () => {

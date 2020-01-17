@@ -1,13 +1,14 @@
 import {
-  visit,
-  ValueNode,
+  ASTNode,
+  DefinitionNode,
+  DocumentNode,
   FieldNode,
   StringValueNode,
-  DefinitionNode,
-  ASTNode,
-  DocumentNode,
+  ValueNode,
+  visit,
 } from 'graphql';
 import flatten from 'lodash/flatten';
+
 import { Entities, NodeWithDirectives } from './types';
 
 function _isStringValueNode(node?: ValueNode): node is StringValueNode {

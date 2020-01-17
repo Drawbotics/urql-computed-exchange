@@ -1,7 +1,7 @@
-import { map, pipe } from 'wonka';
 import { Exchange } from 'urql';
+import { map, pipe } from 'wonka';
 
-import { replaceDirectivesByFragments, addFragmentsFromDirectives } from './directive-utils';
+import { addFragmentsFromDirectives, replaceDirectivesByFragments } from './directive-utils';
 import { resolveData } from './resolve-data';
 import { AugmentedOperation, AugmentedOperationResult, Entities } from './types';
 
