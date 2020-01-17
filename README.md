@@ -64,7 +64,7 @@ const client = createClient({
 export default client;
 ```
 
-Finally, use the `@computed` directive when declaring your GraphQL queries:
+Finally, use the `@computed` directive when declaring your GraphQL queries. Don't forget to indicate the corresponding `type`:
 
 ```javascript
 // App.js

@@ -1,12 +1,43 @@
 {
   "name": "urql-domain-exchange",
-  "version": "0.1.0",
-  "description": "",
-  "author": "Lars <lars.bs@hotmail.com>",
+  "version": "1.0.0",
+  "description": "URQL exchange to allow computed properties in GraphQL queries.",
   "keywords": [],
   "license": "UNLICENSED",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Drawbotics/drawbotics-use-filters"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf lib/",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --ext ts,tsx --format node_modules/eslint-formatter-pretty -c .eslintrc.js --max-warnings=0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.9.0",
+    "@types/lodash": "^4.14.149",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "eslint": "^6.8.0",
+    "eslint-formatter-pretty": "^3.0.1",
+    "eslint-plugin-jest": "^23.6.0",
+    "husky": "^4.0.10",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.5.0",
+    "rimraf": "^3.0.0",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.7.5"
   }
 }

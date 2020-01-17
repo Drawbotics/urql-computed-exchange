@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // Checking
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    // Resolution
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "baseUrl": "./",
+    // Compilation
+    "jsx": "preserve",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2017",
+    "sourceMap": true,
+    "incremental": true,
+    "outDir": "./lib"
+  },
+  "include": ["./src/**/*"]
+}
