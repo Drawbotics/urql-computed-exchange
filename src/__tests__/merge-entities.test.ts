@@ -15,11 +15,11 @@ describe('urql-computed-exchange', () => {
       console.error = consoleError;
     });
 
-    it('should throw an error when receving entities without a name', () => {
+    it('throws an error when receving entities without a name', () => {
       expect(() => mergeEntities({} as Entity)).toThrowError(/No typeName found for entity/);
     });
 
-    it('should create the entities object', () => {
+    it('creates the entities object', () => {
       const Foo = {
         typeName: 'Foo',
       } as Entity;
@@ -36,7 +36,7 @@ describe('urql-computed-exchange', () => {
       });
     });
 
-    it('should merge the fields of entities with the same "typeName"', () => {
+    it('merges the fields of entities with the same "typeName"', () => {
       const resolver = () => null;
 
       const Foo = {
@@ -62,7 +62,7 @@ describe('urql-computed-exchange', () => {
       });
     });
 
-    it('should throw an error when entities with the same "typeName" have the same fields', () => {
+    it('throws an error when entities with the same "typeName" have the same fields', () => {
       const resolver = () => null;
 
       const Foo = {

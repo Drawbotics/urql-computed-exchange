@@ -19,7 +19,7 @@ function _isNodeWithDirectives(node?: any): node is NodeWithDirectives {
   return node != null && node.directives != null;
 }
 
-export function nodeHasComputedDirectives(node: ASTNode): boolean {
+export function nodeHasComputedDirectives(node?: ASTNode): boolean {
   if (!_isNodeWithDirectives(node)) {
     return false;
   }
@@ -29,9 +29,13 @@ export function nodeHasComputedDirectives(node: ASTNode): boolean {
 
 // Return type is "any" because that's the return type of the visit() function from graphql
 export function replaceDirectivesByFragments(
-  query: DefinitionNode | DocumentNode,
+  query: DefinitionNode | DocumentNode | undefined,
   entities: Entities,
 ): any {
+  if (query == null) {
+    return;
+  }
+
   const replaceDirectiveByFragment = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
 
@@ -56,7 +60,7 @@ export function replaceDirectivesByFragments(
     }
 
     // Replace directive node by fragment
-    return replaceDirectivesByFragments(entityField.dependencies.definitions[0], entities);
+    return replaceDirectivesByFragments(entityField.dependencies?.definitions[0], entities);
   };
 
   return visit(query, {
@@ -77,9 +81,13 @@ export function replaceDirectivesByFragments(
 
 // Return type is "any" because that's the return type of the visit() function from graphql
 export function addFragmentsFromDirectives(
-  query: DefinitionNode | DocumentNode,
+  query: DefinitionNode | DocumentNode | undefined,
   entities: Entities,
 ): any {
+  if (query == null) {
+    return;
+  }
+
   const addFragmentToNode = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
 
@@ -108,7 +116,7 @@ export function addFragmentsFromDirectives(
       );
     }
 
-    return addFragmentsFromDirectives(entityField.dependencies.definitions[0], entities);
+    return addFragmentsFromDirectives(entityField.dependencies?.definitions[0], entities);
   };
 
   const firstPass = visit(query, {
