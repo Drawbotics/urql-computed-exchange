@@ -2,7 +2,11 @@ import gql from 'fraql';
 import { print } from 'graphql';
 
 import { createEntity } from '../create-entity';
-import { nodeHasComputedDirectives, replaceDirectivesByFragments } from '../directive-utils';
+import {
+  addFragmentsFromDirectives,
+  nodeHasComputedDirectives,
+  replaceDirectivesByFragments,
+} from '../directive-utils';
 import { mergeEntities } from '../merge-entities';
 import { Entities } from '../types';
 
@@ -152,5 +156,124 @@ describe('urql-computed-exchange', () => {
     });
   });
 
-  describe('addFragmentsFromDirectives', () => {});
+  describe('addFragmentsFromDirectives', () => {
+    let entities: Entities;
+
+    beforeAll(() => {
+      interface FooEntity {
+        oneField: string;
+        fieldWithoutDependencies: string;
+      }
+
+      const Foo = createEntity<FooEntity>('Foo', {
+        oneField: {
+          dependencies: gql`
+            fragment _ on Foo {
+              id
+            }
+          `,
+          resolver: (foo) => foo.id + 'field',
+        },
+        fieldWithoutDependencies: {
+          resolver: (foo) => foo.id + 'field-no-dependencies',
+        },
+      });
+
+      entities = mergeEntities(Foo);
+    });
+
+    it('throws an error when no type is specified in the directive', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            oneField @computed
+          }
+        }
+      `;
+
+      expect(() => addFragmentsFromDirectives(query, entities)).toThrow(
+        /Invalid @computed directive found. No type specified/,
+      );
+    });
+
+    it('throws an error when an unknown type name is specified in the directive', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            oneField @computed(type: Bar)
+          }
+        }
+      `;
+
+      expect(() => addFragmentsFromDirectives(query, entities)).toThrow(
+        /No entity found for type "Bar"/,
+      );
+    });
+
+    it('throws an error when no resolver is found for the computed directive', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            anotherField @computed(type: Foo)
+          }
+        }
+      `;
+
+      expect(() => addFragmentsFromDirectives(query, entities)).toThrow(
+        /No resolver found for @computed directive "anotherField" in type "Foo"/,
+      );
+    });
+
+    it('adds the fragment specified in dependencies without removing the directive', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            oneField @computed(type: Foo)
+          }
+        }
+      `;
+
+      const expectedQuery = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            oneField @computed(type: Foo)
+            ... on Foo {
+              id
+            }
+          }
+        }
+      `;
+
+      const result = addFragmentsFromDirectives(query, entities);
+      expect(print(result)).toEqual(print(expectedQuery));
+    });
+
+    it('just keeps the directive when no dependencies are specified', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            fieldWithoutDependencies @computed(type: Foo)
+          }
+        }
+      `;
+
+      const expectedQuery = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            fieldWithoutDependencies @computed(type: Foo)
+          }
+        }
+      `;
+
+      const result = addFragmentsFromDirectives(query, entities);
+      expect(print(result)).toEqual(print(expectedQuery));
+    });
+  });
 });

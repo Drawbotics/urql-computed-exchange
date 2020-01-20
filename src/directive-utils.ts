@@ -95,7 +95,7 @@ export function addFragmentsFromDirectives(
 
     if (entityField == null) {
       throw new Error(
-        `No resolver found for @computed directive "${fieldName}" in type "${directiveType}`,
+        `No resolver found for @computed directive "${fieldName}" in type "${directiveType}"`,
       );
     }
 
