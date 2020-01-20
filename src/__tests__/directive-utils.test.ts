@@ -1,4 +1,5 @@
 import gql from 'fraql';
+import { print } from 'graphql';
 
 import { createEntity } from '../create-entity';
 import { nodeHasComputedDirectives, replaceDirectivesByFragments } from '../directive-utils';
@@ -38,6 +39,7 @@ describe('urql-computed-exchange', () => {
     beforeAll(() => {
       interface FooEntity {
         oneField: string;
+        fieldWithoutDependencies: string;
       }
 
       const Foo = createEntity<FooEntity>('Foo', {
@@ -48,6 +50,9 @@ describe('urql-computed-exchange', () => {
             }
           `,
           resolver: (foo) => foo.id + 'field',
+        },
+        fieldWithoutDependencies: {
+          resolver: (foo) => foo.id + 'field-no-dependencies',
         },
       });
 
@@ -99,9 +104,52 @@ describe('urql-computed-exchange', () => {
       );
     });
 
-    it('replaces the directive by the fragment in dependencies', () => {});
+    it('replaces the directive by the fragment in dependencies', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            oneField @computed(type: Foo)
+          }
+        }
+      `;
 
-    it('just removes the directive when no dependencies are specified', () => {});
+      const expectedQuery = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            ... on Foo {
+              id
+            }
+          }
+        }
+      `;
+
+      const result = replaceDirectivesByFragments(query, entities);
+      expect(print(result)).toEqual(print(expectedQuery));
+    });
+
+    it('just removes the directive when no dependencies are specified', () => {
+      const query = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+            fieldWithoutDependencies @computed(type: Foo)
+          }
+        }
+      `;
+
+      const expectedQuery = gql`
+        query GetFoo {
+          getFoo(id: "id") {
+            name
+          }
+        }
+      `;
+
+      const result = replaceDirectivesByFragments(query, entities);
+      expect(print(result)).toEqual(print(expectedQuery));
+    });
   });
 
   describe('addFragmentsFromDirectives', () => {});

@@ -31,7 +31,7 @@ export function replaceDirectivesByFragments(
   entities: Entities,
 ): any {
   if (query == null) {
-    return;
+    return null;
   }
 
   const replaceDirectiveByFragment = (node: FieldNode) => {
@@ -78,7 +78,7 @@ export function addFragmentsFromDirectives(
   entities: Entities,
 ): any {
   if (query == null) {
-    return;
+    return null;
   }
 
   const addFragmentToNode = (node: FieldNode) => {
