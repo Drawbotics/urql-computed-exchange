@@ -7,7 +7,7 @@ function _isNodeWithDirectives(node?: any): node is NodeWithDirectives {
   return node != null && node.directives != null;
 }
 
-function _getDirectiveType(directiveNode: any): string {
+export function getDirectiveType(directiveNode: any): string {
   const typeName = directiveNode?.arguments?.[0]?.value?.value;
 
   if (typeName == null) {
@@ -36,7 +36,7 @@ export function replaceDirectivesByFragments(
 
   const replaceDirectiveByFragment = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
-    const directiveType = _getDirectiveType(computedDirective);
+    const directiveType = getDirectiveType(computedDirective);
     const entityType = entities[directiveType];
 
     if (entityType == null) {
@@ -83,7 +83,7 @@ export function addFragmentsFromDirectives(
 
   const addFragmentToNode = (node: FieldNode) => {
     const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
-    const directiveType = _getDirectiveType(computedDirective);
+    const directiveType = getDirectiveType(computedDirective);
     const entityType = entities[directiveType];
 
     if (entityType == null) {

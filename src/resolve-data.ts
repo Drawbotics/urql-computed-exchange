@@ -1,16 +1,21 @@
-import { visit } from 'graphql';
-import graphql from 'graphql-anywhere';
+import { DocumentNode, visit } from 'graphql';
+import graphql, { Resolver } from 'graphql-anywhere';
 
-import { nodeHasComputedDirectives } from './directive-utils';
+import { getDirectiveType, nodeHasComputedDirectives } from './directive-utils';
+import { AugmentedOperation, Entities } from './types';
 
-function _listDocumentComputedDirectives(doc) {
+function _listDocumentComputedDirectives(doc?: DocumentNode) {
+  if (doc == null) {
+    return [];
+  }
+
   const computedDirectives = new Set();
 
   visit(doc, {
     Field(node) {
       if (nodeHasComputedDirectives(node)) {
-        const computedDirective = node.directives.find((d) => d.name.value === 'computed');
-        const directiveType = computedDirective.arguments[0].value.value;
+        const computedDirective = node.directives?.find((d) => d.name.value === 'computed');
+        const directiveType = getDirectiveType(computedDirective);
         computedDirectives.add(`${directiveType}:${node.name.value}`);
       }
     },
@@ -19,11 +24,11 @@ function _listDocumentComputedDirectives(doc) {
   return [...computedDirectives];
 }
 
-function _documentHasComputedDirectives(doc) {
+function _documentHasComputedDirectives(doc?: DocumentNode) {
   return _listDocumentComputedDirectives(doc).length > 0;
 }
 
-export function resolveData(data, operation, entities) {
+export function resolveData(data: any, operation: AugmentedOperation, entities: Entities) {
   const { mixedQuery, originalQuery } = operation;
 
   let pendingResolvers = new Set();
@@ -34,7 +39,7 @@ export function resolveData(data, operation, entities) {
    * Combine our custom resolvers with the default
    * resolver: (field, root) => root[field]
    */
-  const resolver = (fieldName, root = {}, args, context, info) => {
+  const resolver: Resolver = (fieldName, root = {}, args, context, info) => {
     const { resultKey } = info; // this is the new field name if we use an alias => resultKey: fieldName
     const { __typename: typeName } = root;
 
@@ -46,12 +51,12 @@ export function resolveData(data, operation, entities) {
       return aliasValue || nonAliasValue; // we already computed the value of this field
     }
 
-    const shouldUseEntity = entities[typeName] != null && entities[typeName][fieldName] != null;
+    const shouldUseEntity = entities[typeName]?.fields[fieldName] != null;
     if (!shouldUseEntity) {
       return isAliasedField ? aliasValue : nonAliasValue;
     }
 
-    const { resolver, dependencies } = entities[typeName][fieldName];
+    const { resolver, dependencies } = entities[typeName]!.fields[fieldName];
     const resolverId = `${typeName}:${fieldName}`;
 
     if (!_documentHasComputedDirectives(dependencies)) {
