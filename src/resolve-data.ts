@@ -39,7 +39,7 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
    * Combine our custom resolvers with the default
    * resolver: (field, root) => root[field]
    */
-  const resolver: Resolver = (fieldName, root = {}, args, context, info) => {
+  const resolver: Resolver = (fieldName, root = {}, _, __, info) => {
     const { resultKey } = info; // this is the new field name if we use an alias => resultKey: fieldName
     const { __typename: typeName } = root;
 
