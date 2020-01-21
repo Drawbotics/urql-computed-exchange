@@ -45,6 +45,7 @@ describe('urql-computed-exchange', () => {
         interface FooEntity {
           oneField: string;
           fieldWithoutDependencies: string;
+          transitiveField: string;
         }
 
         const Foo = createEntity<FooEntity>('Foo', {
@@ -58,6 +59,15 @@ describe('urql-computed-exchange', () => {
           },
           fieldWithoutDependencies: {
             resolver: (foo) => foo.id + 'field-no-dependencies',
+          },
+          transitiveField: {
+            dependencies: gql`
+              fragment _ on Foo {
+                id
+                oneField @computed(type: Foo)
+              }
+            `,
+            resolver: (foo) => foo.oneField + foo.id,
           },
         });
 
@@ -155,6 +165,34 @@ describe('urql-computed-exchange', () => {
         const result = replaceDirectivesByFragments(query, entities);
         expect(print(result)).toEqual(print(expectedQuery));
       });
+
+      it('can handle transitive dependencies', () => {
+        const query = gql`
+          query GetFoo {
+            getFoo(id: "id") {
+              name
+              transitiveField @computed(type: Foo)
+            }
+          }
+        `;
+
+        const expectedQuery = gql`
+          query GetFoo {
+            getFoo(id: "id") {
+              name
+              ... on Foo {
+                id
+                ... on Foo {
+                  id
+                }
+              }
+            }
+          }
+        `;
+
+        const result = replaceDirectivesByFragments(query, entities);
+        expect(print(result)).toEqual(print(expectedQuery));
+      });
     });
 
     describe('addFragmentsFromDirectives', () => {
@@ -164,6 +202,7 @@ describe('urql-computed-exchange', () => {
         interface FooEntity {
           oneField: string;
           fieldWithoutDependencies: string;
+          transitiveField: string;
         }
 
         const Foo = createEntity<FooEntity>('Foo', {
@@ -177,6 +216,15 @@ describe('urql-computed-exchange', () => {
           },
           fieldWithoutDependencies: {
             resolver: (foo) => foo.id + 'field-no-dependencies',
+          },
+          transitiveField: {
+            dependencies: gql`
+              fragment _ on Foo {
+                id
+                oneField @computed(type: Foo)
+              }
+            `,
+            resolver: (foo) => foo.oneField + foo.id,
           },
         });
 
@@ -269,6 +317,36 @@ describe('urql-computed-exchange', () => {
             getFoo(id: "id") {
               name
               fieldWithoutDependencies @computed(type: Foo)
+            }
+          }
+        `;
+
+        const result = addFragmentsFromDirectives(query, entities);
+        expect(print(result)).toEqual(print(expectedQuery));
+      });
+
+      it('can handle transitive dependencies', () => {
+        const query = gql`
+          query GetFoo {
+            getFoo(id: "id") {
+              name
+              transitiveField @computed(type: Foo)
+            }
+          }
+        `;
+
+        const expectedQuery = gql`
+          query GetFoo {
+            getFoo(id: "id") {
+              name
+              transitiveField @computed(type: Foo)
+              ... on Foo {
+                id
+                oneField @computed(type: Foo)
+                ... on Foo {
+                  id
+                }
+              }
             }
           }
         `;
