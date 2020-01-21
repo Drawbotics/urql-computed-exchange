@@ -2,6 +2,7 @@ import { DocumentNode, visit } from 'graphql';
 import graphql, { Resolver } from 'graphql-anywhere';
 
 import { getDirectiveType, nodeHasComputedDirectives } from './directive-utils';
+import { difference, isEqual } from './set-utils';
 import { AugmentedOperation, Entities } from './types';
 
 function _listDocumentComputedDirectives(doc?: DocumentNode) {
@@ -33,7 +34,6 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
 
   let pendingResolvers = new Set();
   let resolvedResolvers = new Set();
-  let justResolvedResolvers = new Set();
 
   /*
    * Combine our custom resolvers with the default
@@ -60,35 +60,42 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
     const resolverId = `${typeName}:${fieldName}`;
 
     if (!_documentHasComputedDirectives(dependencies)) {
-      // no dependencies
-      // resolve and add it to just resolved resolvers
-      justResolvedResolvers.add(resolverId);
+      // no dependencies, resolve and add it to resolved resolvers
+      resolvedResolvers.add(resolverId);
       return resolver(root);
     }
 
     const dependentResolvers = _listDocumentComputedDirectives(dependencies);
 
-    // TODO: Find a way to spot circular dependencies
-    // TODO: Add support for reducers that return a function
-
     if (dependentResolvers.some((d) => !resolvedResolvers.has(d))) {
-      // not every dependency has been resolved, add it to pending resolvers and return unresolved
+      // not every dependency has been resolved, add it to pending resolvers and return undefined
       pendingResolvers.add(resolverId);
       return undefined;
     } else {
-      // every dependency has been resolved, resolve and add it to just resolved resolvers
-      justResolvedResolvers.add(resolverId);
+      // every dependency has been resolved, resolve and add it to resolved resolvers
+      resolvedResolvers.add(resolverId);
       return resolver(root);
     }
   };
 
   let resolvedData = graphql(resolver, mixedQuery, data);
+  let prevPendingResolvers = new Set();
+  let prevResolvedResolvers = new Set();
 
   while (pendingResolvers.size > 0) {
-    resolvedResolvers = new Set([...resolvedResolvers, ...justResolvedResolvers]);
-    pendingResolvers = new Set();
-    justResolvedResolvers = new Set();
+    prevResolvedResolvers = resolvedResolvers;
     resolvedData = graphql(resolver, mixedQuery, resolvedData);
+    prevPendingResolvers = pendingResolvers;
+    pendingResolvers = difference(pendingResolvers, resolvedResolvers);
+
+    if (
+      isEqual(prevResolvedResolvers, resolvedResolvers) &&
+      isEqual(prevPendingResolvers, pendingResolvers)
+    ) {
+      // did an entire pass without resolving anything, so probably
+      // we're in a situation that cannot be resolved. Just throw an error.
+      throw new Error('Irresoluble dependency chain found.');
+    }
   }
 
   return graphql(resolver, originalQuery, resolvedData);

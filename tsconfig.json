@@ -3,7 +3,7 @@
     // Checking
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strict": true,
+    "strict": false,
     // Resolution
     "moduleResolution": "node",
     "esModuleInterop": true,
