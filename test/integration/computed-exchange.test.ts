@@ -1,21 +1,8 @@
 import gql from 'fraql';
-import {
-  Client,
-  cacheExchange,
-  createClient,
-  createRequest,
-  dedupExchange,
-  fetchExchange,
-} from 'urql';
-import { pipe, subscribe } from 'wonka';
+import { Client, cacheExchange, createClient, dedupExchange, fetchExchange } from 'urql';
 
-import { createMockFetch } from '../utils/simple-mock-fetch';
-
-// import { computedExchange } from '../../src/computed-exchange';
-// import { createEntity } from '../../src/create-entity';
-// import { fetchExchangeMock } from '../utils/fetch-exchange-mock';
-
-// jest.mock('../../src/resolve-data');
+import { computedExchange, createEntity } from '../../src';
+import { createMockFetch, runQuery } from '../utils';
 
 describe('urql-computed-exchange', () => {
   describe('computed-exchange', () => {
@@ -23,73 +10,85 @@ describe('urql-computed-exchange', () => {
       let client: Client;
 
       beforeAll(() => {
-        // const entities = {
-        //   User: createEntity('User', {
-        //     fullName: {
-        //       dependencies: gql`
-        //         fragment _ on User {
-        //           firstName
-        //           lastName
-        //         }
-        //       `,
-        //       resolver: (user) => `${user.firstName} ${user.lastName}`,
-        //     },
-        //   }),
-        // };
+        const entities = {
+          User: createEntity('User', {
+            fullName: {
+              dependencies: gql`
+                fragment _ on User {
+                  firstName
+                  lastName
+                }
+              `,
+              resolver: (user: any) => `${user.firstName} ${user.lastName}`,
+            },
+          }),
+        };
 
         client = createClient({
           url: '/graphql',
-          // fetch: async () => {
-          //   return {
-          //     status: 200,
-          //     json: () => Promise.resolve({ data: { user: { id: 1 } } }),
-          //   } as Response;
-          // },
-          // fetch: createMockFetch().post('/graphql', {
-          //   data: { user: { id: 1 }},
-          // }).post('/graphql2', (data) => {
-          //   if (data) {
-
-          //   }
-          // }).get('/my-get', {}),
           fetch: createMockFetch()
             .post('/graphql', {
               status: 200,
-              json: () => Promise.resolve({ data: { user: { id: 1 } } }),
+              json: async () => {
+                return {
+                  data: {
+                    user: {
+                      id: 1,
+                      firstName: 'Lorem',
+                      lastName: 'Ipsum',
+                      __typename: 'User',
+                    },
+                  },
+                };
+              },
             })
             .build(),
-          exchanges: [
-            dedupExchange,
-            cacheExchange,
-            // computedExchange({ entities }),
-            fetchExchange,
-            // fetchExchangeMock({ user: { id: 1 } }),
-          ],
+          exchanges: [dedupExchange, cacheExchange, computedExchange({ entities }), fetchExchange],
         });
       });
 
-      it('', () => {
+      it('runs queries without computed properties', async () => {
         const query = gql`
           query User {
             user(id: "id") {
               id
+              firstName
+              lastName
             }
           }
         `;
 
-        return new Promise((done) => {
-          const request = createRequest(query);
-          pipe(
-            client.executeQuery(request),
-            subscribe(({ data }) => {
-              console.log('data', data);
-              done();
-            }),
-          );
+        const { data } = await runQuery(client, query);
+        expect(data).toMatchObject({
+          user: {
+            id: 1,
+            firstName: 'Lorem',
+            lastName: 'Ipsum',
+          },
         });
+      });
 
-        // const res = await toPromise(client.executeQuery(query));
-        // console.log(res);
+      it('runs queries with computed properties', async () => {
+        const query = gql`
+          query User {
+            user(id: "id") {
+              id
+              firstName
+              lastName
+              fullName @computed(type: User)
+            }
+          }
+        `;
+
+        const { data } = await runQuery(client, query);
+        expect(data).toMatchObject({
+          user: {
+            id: 1,
+            firstName: 'Lorem',
+            lastName: 'Ipsum',
+            fullName: 'Lorem Ipsum',
+          },
+        });
       });
     });
   });
