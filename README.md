@@ -14,8 +14,9 @@ First, create your entities and their resolvers:
 
 ```javascript
 // entities.js
+import { createEntity, mergeEntities } from 'urql-computed-exchange';
 
-const Pokemon = {
+const Pokemon = createEntity('Pokemon', {
   numberOfEvolutions: {
     dependencies: gql`
       fragment _ on Pokemon {
@@ -25,14 +26,12 @@ const Pokemon = {
       }
     `,
     resolver: (pokemon) => {
-      return (pokemon.evolutions && pokemon.evolutions.length) || 0;
+      return (pokemon.evolutions && pokemon.evolutions.length) ?? 0;
     },
   },
-};
+});
 
-export default {
-  Pokemon,
-};
+export default mergeEntities(Pokemon);
 ```
 
 Then, add it to the list of exchanges in URQL when setting up the client:
@@ -40,7 +39,7 @@ Then, add it to the list of exchanges in URQL when setting up the client:
 ```javascript
 // client.js
 
-import urqlComputedExchange from 'urql-computed-exchange';
+import { computedExchange } from 'urql-computed-exchange';
 import {
   createClient,
   cacheExchange,
