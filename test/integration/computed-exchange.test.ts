@@ -1,12 +1,21 @@
 import gql from 'fraql';
-import { Client, cacheExchange, createClient, dedupExchange } from 'urql';
-import { toPromise } from 'wonka';
+import {
+  Client,
+  cacheExchange,
+  createClient,
+  createRequest,
+  dedupExchange,
+  fetchExchange,
+} from 'urql';
+import { pipe, subscribe } from 'wonka';
+
+import { createMockFetch } from '../utils/simple-mock-fetch';
 
 // import { computedExchange } from '../../src/computed-exchange';
 // import { createEntity } from '../../src/create-entity';
-import { fetchExchangeMock } from '../utils/fetch-exchange-mock';
+// import { fetchExchangeMock } from '../utils/fetch-exchange-mock';
 
-jest.mock('../../src/resolve-data');
+// jest.mock('../../src/resolve-data');
 
 describe('urql-computed-exchange', () => {
   describe('computed-exchange', () => {
@@ -29,17 +38,37 @@ describe('urql-computed-exchange', () => {
         // };
 
         client = createClient({
-          url: '',
+          url: '/graphql',
+          // fetch: async () => {
+          //   return {
+          //     status: 200,
+          //     json: () => Promise.resolve({ data: { user: { id: 1 } } }),
+          //   } as Response;
+          // },
+          // fetch: createMockFetch().post('/graphql', {
+          //   data: { user: { id: 1 }},
+          // }).post('/graphql2', (data) => {
+          //   if (data) {
+
+          //   }
+          // }).get('/my-get', {}),
+          fetch: createMockFetch()
+            .post('/graphql', {
+              status: 200,
+              json: () => Promise.resolve({ data: { user: { id: 1 } } }),
+            })
+            .build(),
           exchanges: [
             dedupExchange,
             cacheExchange,
             // computedExchange({ entities }),
-            fetchExchangeMock(''),
+            fetchExchange,
+            // fetchExchangeMock({ user: { id: 1 } }),
           ],
         });
       });
 
-      it('', async () => {
+      it('', () => {
         const query = gql`
           query User {
             user(id: "id") {
@@ -48,8 +77,19 @@ describe('urql-computed-exchange', () => {
           }
         `;
 
-        const res = await toPromise(client.executeQuery(query));
-        console.log(res);
+        return new Promise((done) => {
+          const request = createRequest(query);
+          pipe(
+            client.executeQuery(request),
+            subscribe(({ data }) => {
+              console.log('data', data);
+              done();
+            }),
+          );
+        });
+
+        // const res = await toPromise(client.executeQuery(query));
+        // console.log(res);
       });
     });
   });
