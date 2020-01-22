@@ -1,6 +1,7 @@
 # compiled output
 /src
 /node_modules
+__tests__
 
 # Logs
 /logs
