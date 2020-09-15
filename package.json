@@ -1,6 +1,6 @@
 {
   "name": "urql-computed-exchange",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "URQL exchange to allow computed properties in GraphQL queries.",
   "keywords": [],
   "license": "UNLICENSED",
