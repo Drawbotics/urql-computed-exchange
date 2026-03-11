@@ -1,5 +1,5 @@
 {
-  "name": "urql-computed-exchange",
+  "name": "@drawbotics/urql-computed-exchange",
   "version": "1.0.2",
   "description": "URQL exchange to allow computed properties in GraphQL queries.",
   "keywords": [],
@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Drawbotics/urql-computed-filters"
+    "url": "https://github.com/Drawbotics/urql-computed-exchange"
   },
   "scripts": {
     "clean": "rimraf lib/",
