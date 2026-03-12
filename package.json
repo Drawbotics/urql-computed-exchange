@@ -1,6 +1,6 @@
 {
   "name": "@drawbotics/urql-computed-exchange",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "URQL exchange to allow computed properties in GraphQL queries.",
   "keywords": [],
   "license": "UNLICENSED",
@@ -30,9 +30,9 @@
     "*.{ts,tsx}": "eslint --max-warnings=0"
   },
   "peerDependencies": {
-    "graphql": "14.x",
-    "urql": "1.8.x",
-    "wonka": "4.x"
+    "graphql": "^14.0.0 || ^15.0.0 || ^16.0.0",
+    "urql": "^1.8.0 || ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0",
+    "wonka": "^4.0.0 || ^5.0.0 || ^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -43,7 +43,7 @@
     "@typescript-eslint/parser": "^8.57.0",
     "eslint": "^10.0.3",
     "eslint-plugin-jest": "^29.15.0",
-    "graphql": "^14.5.8",
+    "graphql": "^16.13.1",
     "graphql-tag": "^2.10.1",
     "husky": "^4.0.10",
     "import-sort-style-module": "^6.0.0",
@@ -55,8 +55,8 @@
     "rimraf": "^3.0.0",
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
-    "urql": "^1.8.2",
-    "wonka": "^4.0.7"
+    "urql": "^5.0.1",
+    "wonka": "^6.3.5"
   },
   "dependencies": {
     "fclone": "^1.0.11",
