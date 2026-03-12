@@ -1,4 +1,4 @@
-import gql from 'fraql';
+import gql from './helpers/fraql';
 import { AugmentedOperation } from 'src/types';
 
 import { createEntity } from '../create-entity';

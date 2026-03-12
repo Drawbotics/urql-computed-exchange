@@ -16,7 +16,7 @@ describe('urql-computed-exchange', () => {
     });
 
     it('throws an error when receving entities without a name', () => {
-      expect(() => mergeEntities({} as Entity)).toThrowError(/No typeName found for entity/);
+      expect(() => mergeEntities({} as Entity)).toThrow(/No typeName found for entity/);
     });
 
     it('creates the entities object', () => {

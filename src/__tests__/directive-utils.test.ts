@@ -1,4 +1,4 @@
-import gql from 'fraql';
+import gql from './helpers/fraql';
 import { print } from 'graphql';
 
 import { createEntity } from '../create-entity';

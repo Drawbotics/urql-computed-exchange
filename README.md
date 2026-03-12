@@ -4,8 +4,37 @@ An [URQL](https://github.com/FormidableLabs/urql) exchange to compute data using
 
 ## Installation
 
+This package is published to [GitHub Packages](https://github.com/features/packages) under the `@drawbotics` scope.
+
+### 1. Configure npm to use GitHub Packages for the `@drawbotics` scope
+
+Create or update your project's `.npmrc`:
+
+```
+@drawbotics:registry=https://npm.pkg.github.com
+```
+
+### 2. Authenticate with GitHub Packages
+
+You need a [GitHub personal access token](https://github.com/settings/tokens) with `read:packages` scope. Add it to your `~/.npmrc`:
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+```
+
+### 3. Install
+
 ```bash
-$ npm i urql-computed-exchange
+npm install @drawbotics/urql-computed-exchange
+```
+
+### Migrating from npm
+
+If you were previously using `urql-computed-exchange` from npm, update your imports:
+
+```diff
+- import { createEntity, mergeEntities, computedExchange } from 'urql-computed-exchange';
++ import { createEntity, mergeEntities, computedExchange } from '@drawbotics/urql-computed-exchange';
 ```
 
 ## Usage
@@ -14,7 +43,7 @@ First, create your entities and their resolvers:
 
 ```javascript
 // entities.js
-import { createEntity, mergeEntities } from 'urql-computed-exchange';
+import { createEntity, mergeEntities } from '@drawbotics/urql-computed-exchange';
 
 const Pokemon = createEntity('Pokemon', {
   numberOfEvolutions: {
@@ -39,7 +68,7 @@ Then, add it to the list of exchanges in URQL when setting up the client:
 ```javascript
 // client.js
 
-import { computedExchange } from 'urql-computed-exchange';
+import { computedExchange } from '@drawbotics/urql-computed-exchange';
 import {
   createClient,
   cacheExchange,

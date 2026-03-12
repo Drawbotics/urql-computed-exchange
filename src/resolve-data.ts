@@ -2,7 +2,7 @@ import { DocumentNode, visit } from 'graphql';
 import graphql, { Resolver } from 'graphql-anywhere';
 
 import { getDirectiveType, nodeHasComputedDirectives } from './directive-utils';
-import { difference, isEqual } from './set-utils';
+import { isEqual } from './set-utils';
 import { AugmentedOperation, Entities } from './types';
 
 function _listDocumentComputedDirectives(doc?: DocumentNode) {
@@ -80,14 +80,12 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
   };
 
   let resolvedData = graphql(resolver, mixedQuery, data);
-  let prevPendingResolvers = new Set();
-  let prevResolvedResolvers = new Set();
 
   while (pendingResolvers.size > 0) {
-    prevResolvedResolvers = resolvedResolvers;
+    const prevResolvedResolvers = new Set(resolvedResolvers);
     resolvedData = graphql(resolver, mixedQuery, resolvedData);
-    prevPendingResolvers = pendingResolvers;
-    pendingResolvers = difference(pendingResolvers, resolvedResolvers);
+    const prevPendingResolvers = pendingResolvers;
+    pendingResolvers = new Set([...pendingResolvers].filter((v) => !resolvedResolvers.has(v)));
 
     if (
       isEqual(prevResolvedResolvers, resolvedResolvers) &&

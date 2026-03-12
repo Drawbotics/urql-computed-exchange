@@ -7,7 +7,10 @@ module.exports = {
   coverageDirectory: './coverage',
   moduleFileExtensions: ['js', 'json', 'ts'],
   testRegex: '.test.ts$',
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/$1',
+  },
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': ['ts-jest', { diagnostics: false }],
   },
 };

@@ -1,5 +1,4 @@
 import { ASTNode, DefinitionNode, DocumentNode, FieldNode, visit } from 'graphql';
-import flatten from 'lodash/flatten';
 
 import { Entities, NodeWithDirectives } from './types';
 
@@ -115,7 +114,7 @@ export function addFragmentsFromDirectives(
   // of Field and InlineFragment from the firstPass
   return visit(firstPass, {
     SelectionSet(node) {
-      node.selections = flatten(node.selections);
+      node.selections = (node.selections as any[]).flat();
       return node;
     },
   });
