@@ -2,6 +2,14 @@
 
 An [URQL](https://github.com/FormidableLabs/urql) exchange to compute data using resolvers and entities.
 
+## Compatibility
+
+| Peer dependency | Supported versions |
+|---|---|
+| `urql` | v3, v4, v5 |
+| `graphql` | v15, v16 |
+| `wonka` | v5, v6 |
+
 ## Installation
 
 This package is published to [GitHub Packages](https://github.com/features/packages) under the `@drawbotics` scope.
@@ -72,7 +80,6 @@ import { computedExchange } from '@drawbotics/urql-computed-exchange';
 import {
   createClient,
   cacheExchange,
-  dedupExchange,
   fetchExchange,
 } from 'urql';
 
@@ -82,7 +89,6 @@ import entities from './entities';
 const client = createClient({
   url: 'https://graphql-pokemon.now.sh/',
   exchanges: [
-    dedupExchange,
     cacheExchange,
     computedExchange({ entities }),
     fetchExchange,
@@ -91,6 +97,8 @@ const client = createClient({
 
 export default client;
 ```
+
+> **Note:** If you're migrating from urql v3, remove `dedupExchange` from your exchanges array — it's now built into the Client in urql v4+.
 
 Finally, use the `@computed` directive when declaring your GraphQL queries. Don't forget to indicate the corresponding `type`:
 

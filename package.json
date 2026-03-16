@@ -1,8 +1,8 @@
 {
   "name": "@drawbotics/urql-computed-exchange",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "URQL exchange to allow computed properties in GraphQL queries.",
-  "keywords": [],
+  "keywords": ["urql", "exchange", "graphql", "computed", "resolvers"],
   "license": "UNLICENSED",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
@@ -39,7 +39,9 @@
     "build:watch": "tsc -w",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:integration": "jest --config ./jest.integration.config.js",
     "test:integration:watch": "jest --config ./jest.integration.config.js --watch",
+    "test:all": "jest && jest --config ./jest.integration.config.js",
     "prepublishOnly": "npm run clean && npm run build",
     "prepare": "husky"
   },

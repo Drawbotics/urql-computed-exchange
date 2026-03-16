@@ -1,5 +1,5 @@
-import gql from 'fraql';
-import { Client, cacheExchange, createClient, dedupExchange, fetchExchange } from 'urql';
+import gql from '../../src/__tests__/helpers/fraql';
+import { Client, cacheExchange, createClient, fetchExchange } from 'urql';
 
 import { computedExchange, createEntity } from '../../src';
 import { createMockFetch, runQuery } from '../utils';
@@ -26,6 +26,7 @@ describe('urql-computed-exchange', () => {
 
         client = createClient({
           url: '/graphql',
+          preferGetMethod: false,
           fetch: createMockFetch()
             .post('/graphql', {
               status: 200,
@@ -43,7 +44,7 @@ describe('urql-computed-exchange', () => {
               },
             })
             .build(),
-          exchanges: [dedupExchange, cacheExchange, computedExchange({ entities }), fetchExchange],
+          exchanges: [cacheExchange, computedExchange({ entities }), fetchExchange],
         });
       });
 
