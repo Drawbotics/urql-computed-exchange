@@ -6,11 +6,11 @@ import { resolveData } from './resolve-data';
 import { AugmentedOperation, AugmentedOperationResult, Entities } from './types';
 
 export function computedExchange({ entities }: { entities: Entities }): Exchange {
-  return ({ forward }) => (op$) =>
-    pipe(
-      op$,
-      map(
-        (op): AugmentedOperation => {
+  return ({ forward }) =>
+    (op$) =>
+      pipe(
+        op$,
+        map((op): AugmentedOperation => {
           const { query } = op;
           const augmentedOp: AugmentedOperation = op as AugmentedOperation;
 
@@ -23,22 +23,21 @@ export function computedExchange({ entities }: { entities: Entities }): Exchange
           augmentedOp.query = replaceDirectivesByFragments(query, entities);
 
           return augmentedOp;
-        },
-      ),
-      forward,
-      map((res) => {
-        const { data } = res;
-        const augmentedRes = res as AugmentedOperationResult;
+        }),
+        forward,
+        map((res) => {
+          const { data } = res;
+          const augmentedRes = res as AugmentedOperationResult;
 
-        augmentedRes.rawData = data;
-        augmentedRes.data = resolveData(data, augmentedRes.operation, entities);
+          augmentedRes.rawData = data;
+          augmentedRes.data = resolveData(data, augmentedRes.operation, entities);
 
-        // We need to restore the original query so URQL caches
-        // the one with the @computed directives instead of the
-        // resolved one.
-        augmentedRes.operation.query = augmentedRes.operation.originalQuery;
+          // We need to restore the original query so URQL caches
+          // the one with the @computed directives instead of the
+          // resolved one.
+          augmentedRes.operation.query = augmentedRes.operation.originalQuery;
 
-        return res;
-      }),
-    );
+          return res;
+        }),
+      );
 }

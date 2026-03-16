@@ -1,7 +1,4 @@
-import graphqlTag, { disableFragmentWarnings } from 'graphql-tag';
-import { print, Source } from 'graphql';
-
-disableFragmentWarnings();
+import { parse, print, Source } from 'graphql';
 
 function toInlineFragment(doc: any): any {
   let definitions = doc.definitions.map((definition: any) => {
@@ -36,9 +33,9 @@ function toInlineFragment(doc: any): any {
   return newDoc;
 }
 
-export default function gql(...args: any[]): any {
-  (graphqlTag as any).resetCaches();
-  const doc = (graphqlTag as any)(...args);
+export default function gql(strings: TemplateStringsArray, ...values: any[]): any {
+  const source = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
+  const doc = parse(source);
 
   if (doc.definitions.every(({ kind }: any) => kind === 'FragmentDefinition')) {
     return toInlineFragment(doc);

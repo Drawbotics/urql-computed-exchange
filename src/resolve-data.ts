@@ -1,7 +1,7 @@
 import { DocumentNode, visit } from 'graphql';
-import graphql, { Resolver } from 'graphql-anywhere';
 
 import { getDirectiveType, nodeHasComputedDirectives } from './directive-utils';
+import { Resolver, graphqlResolve } from './graphql-resolve';
 import { isEqual } from './set-utils';
 import { AugmentedOperation, Entities } from './types';
 
@@ -79,11 +79,11 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
     }
   };
 
-  let resolvedData = graphql(resolver, mixedQuery, data);
+  let resolvedData = graphqlResolve(resolver, mixedQuery, data);
 
   while (pendingResolvers.size > 0) {
     const prevResolvedResolvers = new Set(resolvedResolvers);
-    resolvedData = graphql(resolver, mixedQuery, resolvedData);
+    resolvedData = graphqlResolve(resolver, mixedQuery, resolvedData);
     const prevPendingResolvers = pendingResolvers;
     pendingResolvers = new Set([...pendingResolvers].filter((v) => !resolvedResolvers.has(v)));
 
@@ -97,5 +97,5 @@ export function resolveData(data: any, operation: AugmentedOperation, entities: 
     }
   }
 
-  return graphql(resolver, originalQuery, resolvedData);
+  return graphqlResolve(resolver, originalQuery, resolvedData);
 }

@@ -9,15 +9,12 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     // Compilation
-    "jsx": "preserve",
     "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "target": "ES2019",
-    "sourceMap": true,
-    "incremental": true,
-    "outDir": "./lib"
+    "module": "commonjs",
+    "outDir": "./lib/cjs"
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["./src/__tests__/**/*"]
 }

@@ -1,9 +1,7 @@
-import fclone from 'fclone';
-
 import { Entities, Entity } from './types';
 
 function _mergeFields(target: Entity, source: Entity): Entity {
-  const targetCopy = fclone(target);
+  const targetCopy: Entity = { typeName: target.typeName, fields: { ...target.fields } };
 
   targetCopy.fields = Object.keys(source.fields).reduce((memo, key) => {
     if (Object.prototype.hasOwnProperty.call(memo, key)) {
